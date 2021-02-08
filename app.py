@@ -1,13 +1,19 @@
 # flask_web/app.py
+from flask import Flask, request, abort, jsonify, send_from_directory, render_template, redirect, url_for
+
+import json
+import sys
 import os
-
-from flask import Flask, request, abort, jsonify, send_from_directory
-
 
 UPLOAD_DIRECTORY = "/project/api_uploaded_files"
 
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
+
+OUTPUT_DIRECTORY = "/project/api_output_files"
+
+if not os.path.exists(OUTPUT_DIRECTORY):
+    os.makedirs(OUTPUT_DIRECTORY)
 
 
 app = Flask(__name__)
@@ -28,10 +34,15 @@ def list_files():
     return jsonify(files)
 
 
-@app.route("/files/result")
+
+@app.route("/files/procesed")
 def get_file():
-    """Download a file."""
-    return send_from_directory(UPLOAD_DIRECTORY, "output.json", as_attachment=True)
+    bashcommand = "./concat.sh"
+    import subprocess
+    process = subprocess.Popen(bashcommand.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    return send_from_directory(OUTPUT_DIRECTORY, "output.mp4", as_attachment=True)
+
 
 @app.route("/files/<filename>", methods=["POST"])
 def post_file(filename):
