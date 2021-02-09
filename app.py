@@ -1,9 +1,9 @@
 # flask_web/app.py
 from flask import Flask, request, abort, jsonify, send_from_directory, render_template, redirect, url_for
-
 import json
 import sys
 import os
+import imghdr
 
 UPLOAD_DIRECTORY = "/project/api_uploaded_files"
 
@@ -41,22 +41,25 @@ def get_file():
     import subprocess
     process = subprocess.Popen(bashcommand.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
-    return send_from_directory(OUTPUT_DIRECTORY, "output.mp4", as_attachment=True)
+    # ext = os.environ['MEDIA_FILE_TYPE']
+    return send_from_directory(OUTPUT_DIRECTORY, "output.mp3", as_attachment=True)
 
 
-@app.route("/files/<filename>", methods=["POST"])
-def post_file(filename):
-    """Upload a file."""
-
-    if "/" in filename:
-        # Return 400 BAD REQUEST
-        abort(400, "no subdirectories allowed")
-
-    with open(os.path.join(UPLOAD_DIRECTORY, filename), "wb") as fp:
-        fp.write(request.data)
-
-    # Return 201 CREATED
-    return "", 201
+@app.route('/files', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['file']
+        filename = file.filename
+        file.save(os.path.join(UPLOAD_DIRECTORY, filename))
+    return '''
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    '''
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
