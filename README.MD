@@ -1,4 +1,4 @@
-## Service description
+## Service description:
 This service merge audio files
 It gets some individuals records
 It returns one single play-record
