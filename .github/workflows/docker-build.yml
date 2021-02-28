@@ -15,14 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -38,3 +30,6 @@ jobs:
           context: .
           push: true
           tags: einavl/gitactiontst:latest
+      - name: Docker Layer Caching
+        uses: satackey/action-docker-layer-caching@v0.0.11
+       
